@@ -15,14 +15,14 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
-from django.http import HttpResponse
+from django.urls import path, include, re_path
+from django.views.generic import TemplateView
+import os
 
-def home(request):
-    return HttpResponse("<h1>Welcome to Rwagasore News Site!</h1>")
+vue_index_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../news/static/index.html")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('news.urls')), # API endpoints
-    path("", home), # Default route
+    re_path(r"^.*$", TemplateView.as_view(template_name="index.html")),
 ]
