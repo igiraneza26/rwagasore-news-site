@@ -1,0 +1,1 @@
+web: gunicorn rwagasore_news.wsgi --log-file -
