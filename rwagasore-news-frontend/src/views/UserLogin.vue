@@ -17,7 +17,7 @@ export default {
   },
   methods: {
     login() {
-      api.post("/login/", { username: this.username, password: this.password })
+      api.post("/auth/login/", { username: this.username, password: this.password })
         .then(response => {
           localStorage.setItem("user", response.data.user);
           this.$router.push("/");

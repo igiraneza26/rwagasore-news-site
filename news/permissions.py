@@ -15,7 +15,7 @@ class IsAdminOrUser(permissions.BasePermission):
         if request.user.is_authenticated:
             if request.user.groups.filter(name="Admin").exists():  # Admins can create posts
                 return True
-            if request.user.groups.filter(name="User").exists():  # Regular Users can create posts
+            if request.user.groups.filter(name="RegularUser").exists():  # Regular Users can create posts
                 return True
 
         return False  # Deny if user is a Moderator or not logged in
@@ -40,3 +40,13 @@ class IsAdminOrModeratorOrOwner(permissions.BasePermission):
                 return True
         
         return False  # Deny for all others
+    
+class IsAdminUser(permissions.BasePermission):
+    """Allows only Admins full access"""
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and request.user.groups.filter(name="Admin").exists()
+
+class IsModerator(permissions.BasePermission):
+    """Allows Moderators to edit/delete posts"""
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and request.user.groups.filter(name="Moderator").exists()

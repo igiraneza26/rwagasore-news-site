@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from rest_framework import generics, permissions
 from .models import Post, Comment, Category, Vote, User
 from .serializers import PostSerializer, CommentSerializer, CategorySerializer, VoteSerializer, UserSerializer
-from .permissions import IsAdminOrUser, IsAdminOrModeratorOrOwner
+from .permissions import IsAdminOrUser, IsAdminOrModeratorOrOwner, IsAdminUser, IsModerator
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -12,6 +12,8 @@ from django.contrib.auth.models import User
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.middleware.csrf import get_token
+from rest_framework.permissions import BasePermission, IsAuthenticated
+from django.contrib.auth.models import Group
 
 # Category API View
 class CategoryListView(generics.ListCreateAPIView):
@@ -29,8 +31,13 @@ class PostListCreateView(generics.ListCreateAPIView):
 # Post API View (Retrieve, Update, Delete)
 class PostDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Post.objects.all()
+    serializer_class = PostSerializer #View fro all users to see posts
+    
+# View for Admins  and Moderators to edit/delete posts
+class UpdatePostView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAdminUser | IsModerator] #View fro all users to see posts
 
 # Comment API View (List & Create)
 class CommentListCreateView(generics.ListCreateAPIView):
@@ -112,3 +119,18 @@ def register_user(request):
         data = json.loads(request.body)
         user = User.objects.create_user(username=data["username"], password=data["password"])
         return JsonResponse({"message": "User registered successfully", "user": user.username})
+    
+class IsAdminUser(BasePermission):
+    """Allows only Admins full access"""
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and request.user.groups.filter(name="Admin").exists()
+
+class IsModerator(BasePermission):
+    """Allows Moderators to edit/delete posts"""
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and request.user.groups.filter(name="Moderator").exists()
+
+class IsRegularUser(BasePermission):
+    """Allows Regular Users to create/view posts but not edit/delete"""
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and request.user.groups.filter(name="RegularUser").exists()
