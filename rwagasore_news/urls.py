@@ -17,9 +17,6 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include, re_path
 from django.views.generic import TemplateView
-import os
-
-vue_index_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../news/static/index.html")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
