@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',  # (Optional: for social login like Google, Facebook)
     'dj_rest_auth.registration',  # Enables user registration APIs
     'whitenoise.runserver_nostatic', # Serves static files on Heroku
+    'corsheaders',
 ]
 
 REST_FRAMEWORK = {
@@ -71,7 +72,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True  # Allow all origins for now
 
 ROOT_URLCONF = 'rwagasore_news.urls'
 
