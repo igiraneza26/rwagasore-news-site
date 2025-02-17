@@ -142,3 +142,4 @@ heroku run python manage.py createsuperuser
 heroku open
 ```
 **Your site is now live!**
+![alt text](image.png)
